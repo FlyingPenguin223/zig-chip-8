@@ -6,9 +6,6 @@ const FPS = 60;
 const INSTRUCTIONS_PER_FRAME = 50;
 
 pub fn main() !void {
-    try sdl.init();
-    defer sdl.deinit();
-
     var cpu = try Cpu.init();
     defer cpu.deinit();
     cpu.load_program(@embedFile("roms/slipperyslope.ch8"));

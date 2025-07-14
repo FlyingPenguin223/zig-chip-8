@@ -29,27 +29,30 @@ display: Display,
 keys: [0x10]bool = .{false} ** 0x10,
 should_quit: bool = false,
 
-pub fn init() !Self {
+instructions_per_frame: u32,
+
+pub fn init(instructions: u32) !Self {
     const display = try Display.init();
     errdefer display.deinit();
 
-    return Self{
+    var self = Self{
         .display = display,
+        .instructions_per_frame = instructions,
     };
+
+    for (font, font_start..) |f, i| { // load font
+        self.ram[i] = f;
+    }
+
+    return self;
 }
 
 pub fn deinit(self: Self) void {
     self.display.deinit();
 }
 
-pub fn load_program(self: *Self, program: []const u8) void {
-    for (program, program_start..) |e, i| { // load program
-        self.ram[i] = e;
-    }
-
-    for (font, font_start..) |f, i| { // load font
-        self.ram[i] = f;
-    }
+pub fn program_space(self: *Self) []u8 {
+    return self.ram[0x200 .. 0xFFF - 0x160];
 }
 
 pub fn cycle_events(self: *Self) ?u4 {
@@ -94,6 +97,11 @@ fn match_scancode(scancode: u32) ?u4 {
         sdl.c.SDL_SCANCODE_V => 0x0f,
         else => null,
     };
+}
+
+pub fn execute_opcode_batch(self: *Self) !void {
+    for (0..self.instructions_per_frame) |_|
+        try self.run_next_upcode();
 }
 
 pub fn run_next_upcode(self: *Self) !void {

@@ -4,6 +4,9 @@ const Self = @This();
 
 const Display = @import("display.zig");
 
+const font = @embedFile("font");
+const font_start = 0;
+
 const memorysize = 0xFFF;
 const stacksize = 12;
 
@@ -40,8 +43,12 @@ pub fn deinit(self: Self) void {
 }
 
 pub fn load_program(self: *Self, program: []const u8) void {
-    for (program, program_start..) |e, i| {
+    for (program, program_start..) |e, i| { // load program
         self.ram[i] = e;
+    }
+
+    for (font, font_start..) |f, i| { // load font
+        self.ram[i] = f;
     }
 }
 
@@ -230,8 +237,7 @@ pub fn execute_opcode(self: *Self, opcode: u16) !void {
         self.i += self.v[x];
     } else if (head == 0xF and nn == 0x29) {
         // FX29 set i to address of hex font sprite corresponding to vx
-        // TODO
-        self.i = 200;
+        self.i = self.v[x] * 5 + font_start;
     } else if (head == 0xF and nn == 0x33) {
         // FX33 binary coded decimal
         self.ram[self.i] = self.v[x] / 100;

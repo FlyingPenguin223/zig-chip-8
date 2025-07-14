@@ -5,7 +5,7 @@ const Cpu = @import("cpu.zig");
 const Error = error{FileNotProvidedError};
 
 const FPS = 60;
-const INSTRUCTIONS_PER_FRAME = 50;
+const INSTRUCTIONS_PER_FRAME = 200;
 
 pub fn main() !void {
     var cpu = try Cpu.init();

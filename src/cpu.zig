@@ -39,7 +39,7 @@ pub fn deinit(self: Self) void {
     self.display.deinit();
 }
 
-pub fn load_program(self: *Self, program: [:0]const u8) void {
+pub fn load_program(self: *Self, program: []const u8) void {
     for (program, program_start..) |e, i| {
         self.ram[i] = e;
     }

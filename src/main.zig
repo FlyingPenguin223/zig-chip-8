@@ -2,13 +2,27 @@ const std = @import("std");
 const sdl = @import("sdl.zig");
 const Cpu = @import("cpu.zig");
 
+const Error = error{FileNotProvidedError};
+
 const FPS = 60;
 const INSTRUCTIONS_PER_FRAME = 50;
 
 pub fn main() !void {
     var cpu = try Cpu.init();
     defer cpu.deinit();
-    cpu.load_program(@embedFile("roms/slipperyslope.ch8"));
+
+    if (std.os.argv.len < 2) {
+        std.debug.print("ROM file not provided\n", .{});
+        return Error.FileNotProvidedError;
+    }
+
+    var rom_file = try std.fs.cwd().openFile(std.mem.span(std.os.argv[1]), .{});
+    defer rom_file.close();
+
+    const rom = try rom_file.reader().readAllAlloc(std.heap.c_allocator, 0xDFF); // 0xFFF - 0x200
+    defer std.heap.c_allocator.free(rom);
+
+    cpu.load_program(rom);
 
     while (!cpu.should_quit) {
         const start: sdl.c.Uint64 = sdl.c.SDL_GetTicks64();

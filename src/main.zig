@@ -11,7 +11,7 @@ pub fn main() !void {
 
     var cpu = try Cpu.init();
     defer cpu.deinit();
-    cpu.load_program();
+    cpu.load_program(@embedFile("roms/slipperyslope.ch8"));
 
     while (!cpu.should_quit) {
         const start: sdl.c.Uint64 = sdl.c.SDL_GetTicks64();

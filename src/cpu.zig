@@ -9,8 +9,6 @@ const stacksize = 12;
 
 const program_start = 0x200;
 
-const program = @embedFile("roms/flightrunner.ch8");
-
 v: [16]u8 = .{0} ** 16,
 i: u12 = 0,
 
@@ -41,7 +39,7 @@ pub fn deinit(self: Self) void {
     self.display.deinit();
 }
 
-pub fn load_program(self: *Self) void {
+pub fn load_program(self: *Self, program: [:0]const u8) void {
     for (program, program_start..) |e, i| {
         self.ram[i] = e;
     }
@@ -212,7 +210,6 @@ pub fn execute_opcode(self: *Self, opcode: u16) !void {
         self.v[x] = self.delay_timer;
     } else if (head == 0xF and nn == 0x0A) {
         // FX0A wait for keypress, read to vx
-        // TODO
         while (!self.should_quit) {
             if (self.cycle_events()) |key| {
                 self.v[x] = key;

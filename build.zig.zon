@@ -1,0 +1,16 @@
+.{
+    .name = .chip8,
+    .fingerprint = 0xa61914ab0e471e57,
+
+    .version = "0.0.0",
+
+    .minimum_zig_version = "0.14.1",
+
+    .dependencies = .{},
+
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

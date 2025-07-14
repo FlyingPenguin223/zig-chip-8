@@ -24,10 +24,11 @@ pub fn main() !void {
     }
 
     var rom_file = try std.fs.cwd().openFile(std.mem.span(argv[1]), .{});
-    defer rom_file.close();
 
     const rom = try rom_file.reader().readAllAlloc(std.heap.c_allocator, 0xDFF); // 0xFFF - 0x200
     defer std.heap.c_allocator.free(rom);
+
+    rom_file.close();
 
     cpu.load_program(rom);
 

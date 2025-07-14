@@ -10,6 +10,8 @@ const font_start = 0;
 const memorysize = 0xFFF;
 const stacksize = 12;
 
+const end_reserved = 0x160;
+
 const program_start = 0x200;
 
 v: [16]u8 = .{0} ** 16,
@@ -52,7 +54,7 @@ pub fn deinit(self: Self) void {
 }
 
 pub fn program_space(self: *Self) []u8 {
-    return self.ram[0x200 .. 0xFFF - 0x160];
+    return self.ram[program_start .. memorysize - end_reserved];
 }
 
 pub fn cycle_events(self: *Self) ?u4 {

@@ -128,7 +128,7 @@ pub fn execute_opcode(self: *Self, opcode: u16) !void {
         self.ip = self.stack[self.stack_ptr];
     } else if (head == 0) {
         // 0NNN execute machine language subroutine at NNN
-        std.log.debug("wtf! {x}", .{opcode});
+        std.log.debug("0NNN attempt - opcode: 0x{x:04}", .{opcode});
         // unreachable;
     } else if (head == 1) {
         // 1NNN jump to NNN

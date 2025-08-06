@@ -7,7 +7,7 @@ const Display = @import("display.zig");
 const font = @embedFile("font");
 const font_start = 0;
 
-const memorysize = 0xFFF;
+const memorysize = 0xFFFF;
 const stacksize = 12;
 
 const end_reserved = 0x160;

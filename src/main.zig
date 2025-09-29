@@ -26,7 +26,7 @@ pub fn main() !void {
     {
         var rom_file = try std.fs.cwd().openFile(std.mem.span(argv[1]), .{});
         defer rom_file.close();
-        _ = try rom_file.reader().readAll(cpu.program_space());
+        _ = try rom_file.read(cpu.program_space());
     }
 
     while (!cpu.should_quit) {

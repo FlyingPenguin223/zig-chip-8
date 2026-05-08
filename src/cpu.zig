@@ -101,18 +101,18 @@ fn match_scancode(scancode: u32) ?u4 {
     };
 }
 
-pub fn execute_opcode_batch(self: *Self) !void {
+pub fn execute_opcode_batch(self: *Self, rng: std.Random) !void {
     for (0..self.instructions_per_frame) |_|
-        try self.run_next_upcode();
+        try self.run_next_upcode(rng);
 }
 
-pub fn run_next_upcode(self: *Self) !void {
+pub fn run_next_upcode(self: *Self, rng: std.Random) !void {
     const opcode: u16 = (@as(u16, self.ram[self.ip]) << 8) + self.ram[self.ip + 1];
     self.ip += 2;
-    try self.execute_opcode(opcode);
+    try self.execute_opcode(rng, opcode);
 }
 
-pub fn execute_opcode(self: *Self, opcode: u16) !void {
+pub fn execute_opcode(self: *Self, rng: std.Random, opcode: u16) !void {
     const nnn: u12 = @truncate(opcode);
     const nn: u8 = @truncate(opcode);
     const x: u4 = @truncate(opcode >> 8);
@@ -204,7 +204,7 @@ pub fn execute_opcode(self: *Self, opcode: u16) !void {
         self.ip = nnn + self.v[0];
     } else if (head == 0xC) {
         // CXNN set vx to random with mask NN
-        self.v[x] = std.crypto.random.int(u8) & nn;
+        self.v[x] = rng.int(u8) & nn;
     } else if (head == 0xD) {
         // DXYN draw sprite at vx, vy with N bytes of sprite data starting at i, vf = 1 if pixels unset (collision)
         var collision = false;

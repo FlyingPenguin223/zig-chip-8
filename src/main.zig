@@ -24,7 +24,7 @@ pub fn main(init: std.process.Init) !void {
         instructions_per_frame = try std.fmt.parseInt(u32, argv[2], 10);
     }
 
-    var cpu = try Cpu.init(instructions_per_frame);
+    var cpu = try Cpu.init(rng, instructions_per_frame);
     defer cpu.deinit();
 
     {
@@ -37,7 +37,7 @@ pub fn main(init: std.process.Init) !void {
         const start: sdl.c.Uint64 = sdl.c.SDL_GetTicks64();
         _ = cpu.cycle_events();
 
-        try cpu.execute_opcode_batch(rng);
+        try cpu.execute_opcode_batch();
 
         if (cpu.delay_timer > 0)
             cpu.delay_timer -= 1;

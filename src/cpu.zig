@@ -14,6 +14,8 @@ const end_reserved = 0x160;
 
 const program_start = 0x200;
 
+rng: std.Random,
+
 v: [16]u8 = .{0} ** 16,
 i: u12 = 0,
 
@@ -33,11 +35,12 @@ should_quit: bool = false,
 
 instructions_per_frame: u32,
 
-pub fn init(instructions: u32) !Self {
+pub fn init(rng: std.Random, instructions: u32) !Self {
     const display = try Display.init();
     errdefer display.deinit();
 
     var self = Self{
+        .rng = rng,
         .display = display,
         .instructions_per_frame = instructions,
     };
@@ -101,18 +104,18 @@ fn match_scancode(scancode: u32) ?u4 {
     };
 }
 
-pub fn execute_opcode_batch(self: *Self, rng: std.Random) !void {
+pub fn execute_opcode_batch(self: *Self) !void {
     for (0..self.instructions_per_frame) |_|
-        try self.run_next_upcode(rng);
+        try self.run_next_upcode();
 }
 
-pub fn run_next_upcode(self: *Self, rng: std.Random) !void {
+pub fn run_next_upcode(self: *Self) !void {
     const opcode: u16 = (@as(u16, self.ram[self.ip]) << 8) + self.ram[self.ip + 1];
     self.ip += 2;
-    try self.execute_opcode(rng, opcode);
+    try self.execute_opcode(opcode);
 }
 
-pub fn execute_opcode(self: *Self, rng: std.Random, opcode: u16) !void {
+pub fn execute_opcode(self: *Self, opcode: u16) !void {
     const nnn: u12 = @truncate(opcode);
     const nn: u8 = @truncate(opcode);
     const x: u4 = @truncate(opcode >> 8);
@@ -204,7 +207,7 @@ pub fn execute_opcode(self: *Self, rng: std.Random, opcode: u16) !void {
         self.ip = nnn + self.v[0];
     } else if (head == 0xC) {
         // CXNN set vx to random with mask NN
-        self.v[x] = rng.int(u8) & nn;
+        self.v[x] = self.rng.int(u8) & nn;
     } else if (head == 0xD) {
         // DXYN draw sprite at vx, vy with N bytes of sprite data starting at i, vf = 1 if pixels unset (collision)
         var collision = false;

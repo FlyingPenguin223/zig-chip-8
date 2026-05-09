@@ -1,4 +1,5 @@
 const sdl = @import("sdl.zig");
+
 const Self = @This();
 const Error = error{InitFail};
 
